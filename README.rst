@@ -24,3 +24,10 @@ Build Debian package from local source folder
 ---------------------------------------------
 
 TODO
+
+Build Docker image locally
+--------------------------
+
+.. code:: bash
+
+    make image
