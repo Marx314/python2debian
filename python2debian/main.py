@@ -18,6 +18,7 @@ def main():
     parser.add_argument('--postinst', help='Debian package postinst')
     parser.add_argument('--prerm', help='Debian package prerm')
     parser.add_argument('--postrm', help='Debian package postrm')
+    parser.add_argument('--file', help='Add file to package', action='append')
     args = parser.parse_args()
 
     build(args.build_dir, args.packages_dir, args.install_dir,
@@ -30,7 +31,8 @@ def main():
           preinst=args.preinst,
           postinst=args.postinst,
           prerm=args.prerm,
-          postrm=args.postrm)
+          postrm=args.postrm,
+          files=args.file)
 
 
 if __name__ == '__main__':

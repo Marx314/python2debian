@@ -42,6 +42,25 @@ Build package with custom hooks (prerm, postinst, etc.)
         --postinst=/debian/almanach-api.postinst \
         --prerm=/debian/almanach-api.prerm
 
+Build package with additional files
+-----------------------------------
+
+.. code:: bash
+
+    docker run --rm \
+        -v /tmp/debs:/packages \
+        -v /my/local/debian_folder:/debian \
+        internap/python2debian \
+        --package-name=almanach-api \
+        --package-version=4.0.7 \
+        --package-desc="Almanach is awesome" \
+        --package-author="Internap Hosting <opensource@internap.com>" \
+        --python-package="almanach==4.0.7" \
+        --postinst=/debian/almanach-api.postinst \
+        --prerm=/debian/almanach-api.prerm \
+        --file "/debian/almanach-api.upstart:/etc/init/almanach-api.conf" \
+        --file "/debian/almanach-common.logrotate:/etc/logrotate.d/almanach"
+
 Build Debian package from local source folder
 ---------------------------------------------
 
