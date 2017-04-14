@@ -14,6 +14,10 @@ def main():
     parser.add_argument('--package-author', help='Package author', default='Root <root@localhost>')
     parser.add_argument('--python-version', help='Python version', default='python2.7')
     parser.add_argument('--python-package', help='Python package')
+    parser.add_argument('--preinst', help='Debian package preinst')
+    parser.add_argument('--postinst', help='Debian package postinst')
+    parser.add_argument('--prerm', help='Debian package prerm')
+    parser.add_argument('--postrm', help='Debian package postrm')
     args = parser.parse_args()
 
     build(args.build_dir, args.packages_dir, args.install_dir,
@@ -22,7 +26,11 @@ def main():
           package_version=args.package_version,
           package_author=args.package_author,
           python_version=args.python_version,
-          python_package=args.python_package)
+          python_package=args.python_package,
+          preinst=args.preinst,
+          postinst=args.postinst,
+          prerm=args.prerm,
+          postrm=args.postrm)
 
 
 if __name__ == '__main__':

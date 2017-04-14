@@ -20,6 +20,28 @@ Build Debian package from a Python package:
         --package-author="Internap Hosting <opensource@internap.com>" \
         --python-package="almanach==4.0.7"
 
+.. code:: bash
+
+    ls /tmp/debs/
+    almanach-api_4.0.7_amd64.deb
+
+Build package with custom hooks (prerm, postinst, etc.)
+-------------------------------------------------------
+
+.. code:: bash
+
+    docker run --rm \
+        -v /tmp/debs:/packages \
+        -v /my/local/debian_folder:/debian \
+        internap/python2debian \
+        --package-name=almanach-api \
+        --package-version=4.0.7 \
+        --package-desc="Almanach is awesome" \
+        --package-author="Internap Hosting <opensource@internap.com>" \
+        --python-package="almanach==4.0.7" \
+        --postinst=/debian/almanach-api.postinst \
+        --prerm=/debian/almanach-api.prerm
+
 Build Debian package from local source folder
 ---------------------------------------------
 
