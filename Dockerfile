@@ -4,11 +4,16 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN mkdir /build && \
     mkdir /packages && \
+    mkdir /src && \
     echo "deb http://ppa.launchpad.net/spotify-jyrki/dh-virtualenv/ubuntu trusty main" >> /etc/apt/sources.list && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 36A76C6C49C29687 && \
     apt-get -qq update && \
-    apt-get -qq install -y build-essential libffi-dev libssl-dev devscripts python3 python-dev \
-                           python-virtualenv python3-pip git equivs dh-virtualenv
+    apt-get -qq install -y build-essential libxml2-dev libffi-dev libssl-dev devscripts git equivs dh-virtualenv \
+                           python3 python3-pip \
+                           python-dev python-virtualenv
+
+RUN pip install -U setuptools pip && pip3 install -U setuptools pip
+RUN pip install -U cffi cryptography && pip3 install -U cffi cryptography
 
 COPY python2debian /usr/local/src/python2debian
 COPY setup.py /usr/local/src/

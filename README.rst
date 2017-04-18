@@ -6,10 +6,13 @@ The goal of this project is to create a Debian package from a Python project usi
 Requirements
 ------------
 
-To build a Debian package the only requirement on your machine is Docker.
+- To build a Debian package the only requirement on your machine is Docker.
+- The Docker image is **not rebuilt each time**.
 
 Build Debian package from a Python package:
 -------------------------------------------
+
+Use the argument :code:`python-package`:
 
 .. code:: bash
 
@@ -36,8 +39,6 @@ Build package with custom hooks (prerm, postinst, etc.)
         internap/python2debian \
         --package-name=almanach-api \
         --package-version=4.0.7 \
-        --package-desc="Almanach is awesome" \
-        --package-author="Internap Hosting <opensource@internap.com>" \
         --python-package="almanach==4.0.7" \
         --postinst=/debian/almanach-api.postinst \
         --prerm=/debian/almanach-api.prerm
@@ -53,8 +54,6 @@ Build package with additional files
         internap/python2debian \
         --package-name=almanach-api \
         --package-version=4.0.7 \
-        --package-desc="Almanach is awesome" \
-        --package-author="Internap Hosting <opensource@internap.com>" \
         --python-package="almanach==4.0.7" \
         --postinst=/debian/almanach-api.postinst \
         --prerm=/debian/almanach-api.prerm \
@@ -64,7 +63,34 @@ Build package with additional files
 Build Debian package from local source folder
 ---------------------------------------------
 
-TODO
+Use the argument :code:`source-dir`. The project must have a :code:`setup.py` and optionally a :code:`debian` folder.
+
+.. code:: bash
+
+    docker run --rm \
+        -v /tmp:/packages \
+        -v /my/local/source/folder:/src \
+        internap/python2debian \
+        --package-name=myapp \
+        --package-version=42 \
+        --source-dir=/src
+
+Use another version of Python
+-----------------------------
+
+Use the arguments :code:`python-version` and :code:`python-bin`.
+
+.. code:: bash
+
+    docker run --rm \
+        -v /tmp:/packages \
+        -v /my/local/source/folder:/src \
+        internap/python2debian \
+        --package-name=myapp \
+        --package-version=42 \
+        --python-version=python3.4 \
+        --python-bin=/usr/bin/python3.4 \
+        --source-dir=/src
 
 Build Docker image locally
 --------------------------

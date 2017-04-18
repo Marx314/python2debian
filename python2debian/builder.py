@@ -25,6 +25,12 @@ def strip_slash(filename):
     return filename
 
 
+def copy_and_overwrite(src, dst):
+    if os.path.exists(dst):
+        shutil.rmtree(dst)
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns('.tox', '.git', '*.pyc', '.eggs', '*.egg-info'))
+
+
 def create_file_from_template(filename, template, **kwargs):
     with open(filename, 'w') as f:
         f.write(render_template(template, **kwargs))
@@ -38,8 +44,8 @@ def create_debian_files(debian_folder, **kwargs):
     os.chmod(os.path.join(debian_folder, 'rules'), 0o0755)
 
 
-def create_setup_file(debian_folder, **kwargs):
-    create_file_from_template(os.path.join(debian_folder, 'setup.py'), 'setup.py.j2', **kwargs)
+def create_setup_file(build_folder, **kwargs):
+    create_file_from_template(os.path.join(build_folder, 'setup.py'), 'setup.py.j2', **kwargs)
 
 
 def add_file(src_filename, dst_filename):
@@ -68,8 +74,17 @@ def add_files(build_folder, debian_folder, package_name, files):
                 f.write("{} /{}\n".format(dst_file, os.path.dirname(dst_file)))
 
 
-def prepare_package(build_folder, **kwargs):
+def prepare_package(build_folder, source_folder, **kwargs):
     kwargs['package_date'] = time.strftime('%a, %d %b %Y %H:%M:%S %z')
+
+    if source_folder:
+        logger.info('Packaging source folder: {}'.format(source_folder))
+        copy_and_overwrite(source_folder, build_folder)
+    elif kwargs.get('python_package'):
+        logger.info('Packaging Python application: {}'.format(kwargs.get('python_package')))
+        create_setup_file(build_folder, **kwargs)
+    else:
+        raise Exception('You must provide a python package to install or a source folder')
 
     debian_folder = os.path.join(build_folder, 'debian')
     if not os.path.exists(debian_folder):
@@ -78,10 +93,7 @@ def prepare_package(build_folder, **kwargs):
     create_debian_files(debian_folder, **kwargs)
 
     add_files(build_folder, debian_folder,
-              kwargs.get('package_name'), kwargs.get('files', []))
-
-    if kwargs.get('python_package'):
-        create_setup_file(build_folder, **kwargs)
+              kwargs.get('package_name'), kwargs.get('files') or [])
 
     for hook in ['preinst', 'postinst', 'prerm', 'postrm']:
         hook_filename = kwargs.get(hook)
@@ -89,11 +101,14 @@ def prepare_package(build_folder, **kwargs):
             add_file(hook_filename, os.path.join(debian_folder, hook))
 
 
-def create_package(build_folder, install_folder):
+def create_package(build_folder, install_folder, package_version):
     os.chdir(build_folder)
 
     env = os.environ.copy()
     env['DH_VIRTUALENV_INSTALL_ROOT'] = install_folder
+    env['DH_UPGRADE_PIP'] = ''
+    env['DH_UPGRADE_SETUPTOOLS'] = ''
+    env['PBR_VERSION'] = package_version
 
     subprocess.call(['dpkg-buildpackage', '-us', '-uc'], env=env)
 
@@ -106,7 +121,7 @@ def move_packages(binary_folder):
         shutil.move(debian_file, binary_folder)
 
 
-def build(build_folder, binary_folder, install_folder, **kwargs):
-    prepare_package(build_folder, **kwargs)
-    create_package(build_folder, install_folder)
+def build(build_folder, binary_folder, install_folder, source_folder, **kwargs):
+    prepare_package(build_folder, source_folder, **kwargs)
+    create_package(build_folder, install_folder, kwargs.get('package_version'))
     move_packages(binary_folder)
