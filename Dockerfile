@@ -9,7 +9,7 @@ RUN mkdir /build && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 36A76C6C49C29687 && \
     apt-get -qq update && \
     apt-get -qq install -y build-essential libxml2-dev libffi-dev libssl-dev devscripts git equivs dh-virtualenv \
-                           python3 python3-pip \
+                           python3 python3-dev python3-pip libyaml-dev libmysqlclient-dev \
                            python-dev python-virtualenv
 
 RUN pip install -U setuptools pip && pip3 install -U setuptools pip
